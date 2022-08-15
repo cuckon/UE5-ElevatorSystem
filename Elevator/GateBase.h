@@ -1,0 +1,52 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "GateBase.generated.h"
+
+UCLASS()
+class ELEVATOR_API AGateBase : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AGateBase();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
+		void OnPendingUp();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
+		void OnPendingDown();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
+		void StartedUp();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
+		void StartedDown();
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
+		bool IsPendingUp = false;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
+		bool IsPendingDown = false;
+
+
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+
+	void OnPendingUp_Implementation();
+	void OnPendingDown_Implementation();
+	void StartedUp_Implementation();
+	void StartedDown_Implementation();
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+};
