@@ -24,23 +24,12 @@ ElevatorState AElevatorBase::GetState() const
 	return ElevatorState::kStopped;
 }
 
-void AElevatorBase::SetManager(AElevatorManager* NewManager)
-{
-	Manager = NewManager;
-}
 
 // Called when the game starts or when spawned
 void AElevatorBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (!Manager) {
-		UE_LOG(LogInit, Error, TEXT("Manager is not set: %s"), *GetActorLabel());
-		return;
-	}
-
 	EaseMove->ArrivalDelegate.AddUniqueDynamic(this, &AElevatorBase::OnArrivial);
-	IdxInManager = Manager->Elevators.Find(this);
 }
 
 void AElevatorBase::OnArrivial_Implementation() {
@@ -52,6 +41,11 @@ void AElevatorBase::OnArrivial_Implementation() {
 	// TODO: begin after cloing the door
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &AElevatorBase::StartNextMove, 1.0, false);
+}
+
+int AElevatorBase::GetIdxInManager()
+{
+	return Manager->Elevators.Find(this);
 }
 
 void AElevatorBase::StartNextMove()
@@ -68,7 +62,7 @@ void AElevatorBase::StartNextMove()
 	EaseMove->MoveTo(TargetPos);
 
 	UE_LOG(
-		LogTemp, Error, TEXT("StartNextMove: %d"),
+		LogTemp, Log, TEXT("StartNextMove: %d"),
 		Roadmap[0]
 	);
 }

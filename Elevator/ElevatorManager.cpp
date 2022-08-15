@@ -37,6 +37,7 @@ void AElevatorManager::BeginPlay()
 		Elevator->ArrivalDelegates.AddUniqueDynamic(this, &AElevatorManager::OnAnyArrival);
 	}
 
+
 	AElevatorBase* Elevator = Elevators[0];
 	
 	// Todo : Replace this
@@ -51,10 +52,6 @@ void AElevatorManager::BeginPlay()
 
 void AElevatorManager::OnAnyArrival_Implementation(int GateIdx, int ElevatorIdx)
 {
-	/*UE_LOG(
-		LogTemp, Log, TEXT("Gate: %s Elevator: %s"),
-		*Gates[GateIdx]->GetActorLabel(), *Elevators[ElevatorIdx]->GetActorLabel()
-	);*/
 	UE_LOG(
 		LogTemp, Log, TEXT("Gate: %d Elevator: %d"),
 		GateIdx, ElevatorIdx
@@ -66,9 +63,5 @@ void AElevatorManager::OnAnyArrival_Implementation(int GateIdx, int ElevatorIdx)
 void AElevatorManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	/*for (auto Elevator : Elevators) {
-		Schedule(Elevator);
-	}*/
-
 }
 

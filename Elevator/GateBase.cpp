@@ -2,6 +2,8 @@
 
 
 #include "GateBase.h"
+#include "ElevatorManager.h"
+
 
 // Sets default values
 AGateBase::AGateBase()
@@ -36,6 +38,11 @@ void AGateBase::StartedUp_Implementation()
 void AGateBase::StartedDown_Implementation()
 {
 	IsPendingDown = false;
+}
+
+int AGateBase::GetIdxInManager()
+{
+	return Manager->Gates.Find(this);;
 }
 
 // Called every frame

@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ElevatorManagable.h"
 #include "GateBase.generated.h"
 
 UCLASS()
-class ELEVATOR_API AGateBase : public AActor
+class ELEVATOR_API AGateBase : public AActor, public ElevatorManagable
 {
 	GENERATED_BODY()
 	
@@ -33,8 +34,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
 		bool IsPendingDown = false;
 
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,6 +43,8 @@ protected:
 	void OnPendingDown_Implementation();
 	void StartedUp_Implementation();
 	void StartedDown_Implementation();
+
+	virtual int GetIdxInManager() override;
 
 public:	
 	// Called every frame

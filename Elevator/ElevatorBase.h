@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
+#include "ElevatorManagable.h"
 #include "ElevatorBase.generated.h"
 
 
@@ -21,7 +21,7 @@ enum class ElevatorState : uint8 {
 
 
 UCLASS()
-class ELEVATOR_API AElevatorBase : public AActor
+class ELEVATOR_API AElevatorBase : public AActor, public ElevatorManagable
 {
 	GENERATED_BODY()
 	
@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		ElevatorState GetState() const;
 
-	void SetManager(AElevatorManager*);
+	//void SetManager(AElevatorManager*);
 	void StartNextMove();
 
 	
@@ -52,10 +52,11 @@ protected:
 		void OnArrivial();
 
 	void OnArrivial_Implementation();
+	
+	virtual int GetIdxInManager() override;
 
-
-	AElevatorManager* Manager = nullptr;
-	int IdxInManager;
+	//AElevatorManager* Manager = nullptr;
+	//int IdxInManager;
 
 public:	
 	// Called every frame
