@@ -36,6 +36,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
 		void OnAnyArrival(int GateIdx, int ElevatorIdx);
 
+	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
+		void OnAnyPending(int GateIdx);
+
 	void OnAnyArrival_Implementation(int, int);
 
 public:	

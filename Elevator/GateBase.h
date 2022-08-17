@@ -7,12 +7,15 @@
 #include "ElevatorManagable.h"
 #include "GateBase.generated.h"
 
+
 UCLASS()
 class ELEVATOR_API AGateBase : public AActor, public ElevatorManagable
 {
 	GENERATED_BODY()
 	
 public:	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParams(FGateStateChangeSignature, int, GateIdx);
+
 	// Sets default values for this actor's properties
 	AGateBase();
 
@@ -34,10 +37,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
 		bool IsPendingDown = false;
 
+	FGateStateChangeSignature PendingUpDelegates;
+	FGateStateChangeSignature PendingDownDelegates;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 	void OnPendingUp_Implementation();
 	void OnPendingDown_Implementation();

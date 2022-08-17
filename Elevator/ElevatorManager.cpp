@@ -36,7 +36,10 @@ void AElevatorManager::BeginPlay()
 		Elevator->SetManager(this);
 		Elevator->ArrivalDelegates.AddUniqueDynamic(this, &AElevatorManager::OnAnyArrival);
 	}
-
+	for (auto Gate : Gates) {
+		Gate->SetManager(this);
+		Gate->PendingDownDelegates.AddUniqueDynamic(this, &AElevatorManager::OnAnyPending);
+	}
 
 	AElevatorBase* Elevator = Elevators[0];
 	
@@ -48,6 +51,8 @@ void AElevatorManager::BeginPlay()
 	FTimerHandle TimerHandle;
 	GetWorldTimerManager().SetTimer(TimerHandle, Elevator, &AElevatorBase::StartNextMove, 1.5, false);
 }
+
+
 
 
 void AElevatorManager::OnAnyArrival_Implementation(int GateIdx, int ElevatorIdx)
