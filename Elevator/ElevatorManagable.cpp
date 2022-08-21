@@ -1,5 +1,6 @@
-#include <Logging/LogMacros.h>
 #include "ElevatorManagable.h"
+
+#include <Logging/LogMacros.h>
 #include "ElevatorManager.h"
 
 void ElevatorManagable::SetManager(AElevatorManager* NewManager)

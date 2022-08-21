@@ -42,9 +42,18 @@ protected:
 		void OnAnyArrival(int GateIdx, int ElevatorIdx);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnAnyPending(int GateIdx);
+		void OnAnyPendingUp(int GateIdx);
+	
+	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
+		void OnAnyPendingDown(int GateIdx);
 
 	void OnAnyArrival_Implementation(int, int);
+	void OnAnyPendingUp_Implementation(int);
+	void OnAnyPendingDown_Implementation(int);
+	void OnAnyPending(bool IsUp, int GateIdx);
+	bool CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx);
+
+	TArray<int> PendingUpGates, PendingDownGates;
 
 public:	
 	// Called every frame

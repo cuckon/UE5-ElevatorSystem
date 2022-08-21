@@ -48,7 +48,6 @@ protected:
 	void OnPendingDown_Implementation();
 	void StartedUp_Implementation();
 	void StartedDown_Implementation();
-
 	virtual int GetIdxInManager() override;
 
 public:	

@@ -35,14 +35,14 @@ public:
 		UEaseMoveComponent* EaseMove;
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
-		ElevatorState GetState() const;
+		ElevatorState GetState() const { return State; }
 
-	//void SetManager(AElevatorManager*);
-	void StartNextMove();
+	UFUNCTION(BlueprintCallable, Category = "Elevator")
+		void MoveToGate(int NewTargetGateIdx);
 
-	
-	TArray<int> Roadmap;
 	FElevatorArrivalSignature ArrivalDelegates;
+	int TargetGateIdx = -1;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -52,11 +52,9 @@ protected:
 		void OnArrivial();
 
 	void OnArrivial_Implementation();
-	
 	virtual int GetIdxInManager() override;
 
-	//AElevatorManager* Manager = nullptr;
-	//int IdxInManager;
+	ElevatorState State = ElevatorState::kStopped;
 
 public:	
 	// Called every frame
