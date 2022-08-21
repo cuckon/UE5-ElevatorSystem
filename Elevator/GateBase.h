@@ -14,7 +14,7 @@ class ELEVATOR_API AGateBase : public AActor, public ElevatorManagable
 	GENERATED_BODY()
 	
 public:	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParams(FGateStateChangeSignature, int, GateIdx);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGateStateChangeSignature, int, GateIdx);
 
 	// Sets default values for this actor's properties
 	AGateBase();

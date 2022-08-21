@@ -23,13 +23,13 @@ void AGateBase::BeginPlay()
 void AGateBase::OnPendingUp_Implementation()
 {
 	IsPendingUp = true;
-	PendingUpDelegates.broadcast(IdxInManager);
+	PendingUpDelegates.Broadcast(IdxInManager);
 }
 
 void AGateBase::OnPendingDown_Implementation()
 {
 	IsPendingDown = true;
-	PendingDownDelegates.broadcast(IdxInManager);
+	PendingDownDelegates.Broadcast(IdxInManager);
 }
 
 void AGateBase::StartedUp_Implementation()

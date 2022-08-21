@@ -25,6 +25,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
 		TArray<AGateBase*> Gates;
 
+	UFUNCTION(CallInEditor, Category = "Elevator")
+		void AddAllGates();
+
+	UFUNCTION(CallInEditor, Category = "Elevator")
+		void AddAllElevators();
 
 protected:
 	void Schedule(AElevatorBase* Elevator);

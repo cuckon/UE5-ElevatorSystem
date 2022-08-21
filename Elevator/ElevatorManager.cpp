@@ -19,6 +19,16 @@ AElevatorManager::AElevatorManager()
 
 }
 
+void AElevatorManager::AddAllGates()
+{
+	UE_LOG(LogTemp, Log, TEXT("AddAllGates"));
+}
+
+void AElevatorManager::AddAllElevators()
+{
+	UE_LOG(LogTemp, Log, TEXT("AddAllElevators"));
+}
+
 void AElevatorManager::Schedule(AElevatorBase* Elevator)
 {
 }
@@ -53,7 +63,10 @@ void AElevatorManager::BeginPlay()
 }
 
 
+void AElevatorManager::OnAnyPending_Implementation(int GateIdx)
+{
 
+}
 
 void AElevatorManager::OnAnyArrival_Implementation(int GateIdx, int ElevatorIdx)
 {
