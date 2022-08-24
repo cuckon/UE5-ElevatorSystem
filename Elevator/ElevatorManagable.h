@@ -12,6 +12,6 @@ protected:
     int IdxInManager;
 
     virtual int GetIdxInManager() = 0;
-    virtual void BeginPlay();
+    virtual bool InitManagable();
 };
 

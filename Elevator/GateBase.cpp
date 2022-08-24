@@ -13,11 +13,11 @@ AGateBase::AGateBase()
 
 }
 
-// Called when the game starts or when spawned
+ //Called when the game starts or when spawned
 void AGateBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	InitManagable();
 }
 
 void AGateBase::OnPendingUp_Implementation()

@@ -39,7 +39,10 @@ protected:
 	USceneComponent* SceneComponent;
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnAnyArrival(int GateIdx, int ElevatorIdx);
+		void OnAnyArrivalUp(int GateIdx, int ElevatorIdx);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
+		void OnAnyArrivalDown(int GateIdx, int ElevatorIdx);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
 		void OnAnyPendingUp(int GateIdx);
@@ -47,7 +50,8 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
 		void OnAnyPendingDown(int GateIdx);
 
-	void OnAnyArrival_Implementation(int, int);
+	void OnAnyArrivalUp_Implementation(int, int);
+	void OnAnyArrivalDown_Implementation(int, int);
 	void OnAnyPendingUp_Implementation(int);
 	void OnAnyPendingDown_Implementation(int);
 	void OnAnyPending(bool IsUp, int GateIdx);

@@ -3,16 +3,20 @@
 #include <Logging/LogMacros.h>
 #include "ElevatorManager.h"
 
+PRAGMA_DISABLE_OPTIMIZATION
+
 void ElevatorManagable::SetManager(AElevatorManager* NewManager)
 {
     Manager = NewManager;
 }
 
-void ElevatorManagable::BeginPlay()
+bool ElevatorManagable::InitManagable()
 {
 	if (!Manager) {
 		UE_LOG(LogInit, Error, TEXT("Manager is not set"));
-		return;
+		return false;
 	}
 	IdxInManager = GetIdxInManager();
+	
+	return true;
 }

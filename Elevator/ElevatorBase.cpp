@@ -24,11 +24,13 @@ AElevatorBase::AElevatorBase()
 void AElevatorBase::BeginPlay()
 {
 	Super::BeginPlay();
+	InitManagable();
 	EaseMove->ArrivalDelegate.AddUniqueDynamic(this, &AElevatorBase::OnArrivial);
 }
 
 
 void AElevatorBase::OnArrivial_Implementation() {
+	FElevatorArrivalSignature ArrivalDelegates = State == ElevatorState::kUp ? ArrivalUpDelegates : ArrivalDownDelegates;
 	ArrivalDelegates.Broadcast(TargetGateIdx, IdxInManager);
 	State = ElevatorState::kStopped;
 }

@@ -40,7 +40,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		void MoveToGate(int NewTargetGateIdx);
 
-	FElevatorArrivalSignature ArrivalDelegates;
+	FElevatorArrivalSignature ArrivalUpDelegates, ArrivalDownDelegates;
 	int TargetGateIdx = -1;
 
 

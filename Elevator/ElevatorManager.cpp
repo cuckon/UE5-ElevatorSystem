@@ -33,7 +33,8 @@ void AElevatorManager::AddAllElevators()
 
 void AElevatorManager::Schedule(AElevatorBase* Elevator)
 {
-	auto& GateIndices = Elevator->GetState() == ElevatorState::kUp ? PendingUpGates : PendingDownGates;
+	bool PickTheUp = Elevator->GetState() == ElevatorState::kUp || Elevator->GetState() == ElevatorState::kStopped;
+	auto& GateIndices = PickTheUp ? PendingUpGates : PendingDownGates;
 
 	for (auto GateIdx : GateIndices) {
 		if (CanPickGateOnThisRide(Elevator, GateIdx)) {
@@ -54,7 +55,8 @@ void AElevatorManager::BeginPlay()
 
 	for (auto Elevator : Elevators) {
 		Elevator->SetManager(this);
-		Elevator->ArrivalDelegates.AddDynamic(this, &AElevatorManager::OnAnyArrival);
+		Elevator->ArrivalUpDelegates.AddDynamic(this, &AElevatorManager::OnAnyArrivalUp);
+		Elevator->ArrivalDownDelegates.AddDynamic(this, &AElevatorManager::OnAnyArrivalDown);
 	}
 	for (auto Gate : Gates) {
 		Gate->SetManager(this);
@@ -62,12 +64,6 @@ void AElevatorManager::BeginPlay()
 		Gate->PendingUpDelegates.AddDynamic(this, &AElevatorManager::OnAnyPendingUp);
 	}
 
-	// Todo : Replace this
-	AElevatorBase* Elevator = Elevators[0];
-
-	FTimerHandle TimerHandle;
-	FTimerDelegate ToDo = FTimerDelegate::CreateUObject(Elevator, &AElevatorBase::MoveToGate, 3);
-	GetWorldTimerManager().SetTimer(TimerHandle, ToDo, 1.5, false);
 }
 
 
@@ -105,12 +101,14 @@ void AElevatorManager::OnAnyPendingDown_Implementation(int GateIdx)
 	AElevatorManager::OnAnyPending(false, GateIdx);
 }
 
-void AElevatorManager::OnAnyArrival_Implementation(int GateIdx, int ElevatorIdx)
+void AElevatorManager::OnAnyArrivalUp_Implementation(int GateIdx, int ElevatorIdx)
 {
-	UE_LOG(
-		LogTemp, Log, TEXT("Gate: %d Elevator: %d"),
-		GateIdx, ElevatorIdx
-	);
+	PendingUpGates.RemoveAt(0);
+}
+
+void AElevatorManager::OnAnyArrivalDown_Implementation(int GateIdx, int ElevatorIdx)
+{
+	PendingDownGates.RemoveAt(0);
 }
 
 
