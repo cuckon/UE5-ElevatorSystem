@@ -5,19 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ElevatorManagable.h"
+#include "ElevatorCommon.h"
 #include "ElevatorBase.generated.h"
 
 
 class UEaseMoveComponent;
 class AElevatorManager;
-
-
-UENUM(BlueprintType)
-enum class ElevatorState : uint8 {
-	kUp UMETA(DisplayName = "Up"),
-	kDown UMETA(DisplayName = "Down"),
-	kStopped UMETA(DisplayName = "Stopped")
-};
 
 
 UCLASS()
@@ -38,7 +31,13 @@ public:
 		ElevatorState GetState() const { return State; }
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
-		void MoveToGate(int NewTargetGateIdx);
+		ElevatorState GetReasonOfMoving() const { return ReasonOfMoving; }
+
+	// Move to `NewTargetGateIdx`, switch to `Reason` when arrived.
+	UFUNCTION(BlueprintCallable, Category = "Elevator")
+		void MoveToGate(int NewTargetGateIdx, ElevatorState Reason);
+
+
 
 	FElevatorArrivalSignature ArrivalUpDelegates, ArrivalDownDelegates;
 	int TargetGateIdx = -1;
@@ -55,6 +54,8 @@ protected:
 	virtual int GetIdxInManager() override;
 
 	ElevatorState State = ElevatorState::kStopped;
+
+	ElevatorState ReasonOfMoving;  // Switch to this state after arrival
 
 public:	
 	// Called every frame

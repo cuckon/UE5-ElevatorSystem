@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ElevatorCommon.h"
 #include "ElevatorManager.generated.h"
 
 class AElevatorBase;
@@ -32,32 +33,36 @@ public:
 		void AddAllElevators();
 
 protected:
-	void Schedule(AElevatorBase* Elevator);
+	void Schedule(AElevatorBase* Elevator, int GateIdx, bool IsUp);
 
 	virtual void BeginPlay() override;
 
 	USceneComponent* SceneComponent;
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnAnyArrivalUp(int GateIdx, int ElevatorIdx);
+		void OnArrivalUp(int GateIdx, int ElevatorIdx);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnAnyArrivalDown(int GateIdx, int ElevatorIdx);
+		void OnArrivalDown(int GateIdx, int ElevatorIdx);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnAnyPendingUp(int GateIdx);
+		void OnPendingUp(int GateIdx);
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnAnyPendingDown(int GateIdx);
+		void OnPendingDown(int GateIdx);
 
-	void OnAnyArrivalUp_Implementation(int, int);
-	void OnAnyArrivalDown_Implementation(int, int);
-	void OnAnyPendingUp_Implementation(int);
-	void OnAnyPendingDown_Implementation(int);
+	void OnArrivalUp_Implementation(int, int);
+	void OnArrivalDown_Implementation(int, int);
+	void OnAnyArrival(int, int);
+	void OnPendingUp_Implementation(int);
+	void OnPendingDown_Implementation(int);
 	void OnAnyPending(bool IsUp, int GateIdx);
-	bool CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx);
+	int BestElevatorForPendingGate(int GateIdx, bool ForUp) const;
+	bool CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx) const;
+	void GetUntakenPendingGates(bool Up, TArray<int>& out) const;
 
-	TArray<int> PendingUpGates, PendingDownGates;
+	TArray<int> PendingGatesUp, PendingGatesDown;
+	TSet<int> PendingGatesUpTaken, PendingGatesDownTaken;
 
 public:	
 	// Called every frame

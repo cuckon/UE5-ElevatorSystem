@@ -36,7 +36,7 @@ void AElevatorBase::OnArrivial_Implementation() {
 }
 
 
-void AElevatorBase::MoveToGate(int NewTargetGateIdx) {
+void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
 	TargetGateIdx = NewTargetGateIdx;
 
 	FVector TargetPos = GetActorLocation();
@@ -50,6 +50,8 @@ void AElevatorBase::MoveToGate(int NewTargetGateIdx) {
 		State = ElevatorState::kDown;
 	else
 		State = ElevatorState::kStopped;
+
+	ReasonOfMoving = Reason;
 }
 
 
