@@ -20,11 +20,9 @@ UEaseMoveComponent::UEaseMoveComponent()
 
 void UEaseMoveComponent::MoveTo(const FVector& Position)
 {
-	if (IsArrived)
-		BeginMoveDelegate.Broadcast();
-	
 	TargetPosition = Position;
 	IsArrived = false;
+	BeginMoveDelegate.Broadcast();
 }
 
 // Called when the game starts

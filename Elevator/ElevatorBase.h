@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ElevatorManagable.h"
+#include "ManagableBase.h"
 #include "ElevatorCommon.h"
 #include "ElevatorBase.generated.h"
 
@@ -14,7 +14,7 @@ class AElevatorManager;
 
 
 UCLASS(ClassGroup=Elevator)
-class ELEVATOR_API AElevatorBase : public AActor, public ElevatorManagable
+class ELEVATOR_API AElevatorBase : public AManagableBase
 {
 	GENERATED_BODY()
 	
@@ -37,11 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		void MoveToGate(int NewTargetGateIdx, ElevatorState Reason);
 
-
-
 	FElevatorArrivalSignature ArrivalUpDelegates, ArrivalDownDelegates;
 	int TargetGateIdx = -1;
-
 
 protected:
 	// Called when the game starts or when spawned

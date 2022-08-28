@@ -18,7 +18,6 @@ AGateBase::AGateBase()
 void AGateBase::BeginPlay()
 {
 	Super::BeginPlay();
-	InitManagable();
 }
 
 void AGateBase::OnPendingUp_Implementation()

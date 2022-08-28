@@ -32,6 +32,8 @@ public:
 	UFUNCTION(CallInEditor, Category = "Elevator")
 		void AddAllElevators();
 
+	void PreInitializeComponents() override;
+
 protected:
 	//void Schedule(AElevatorBase* Elevator, int GateIdx, bool IsUp);
 

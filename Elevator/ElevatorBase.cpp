@@ -16,7 +16,6 @@ AElevatorBase::AElevatorBase()
 	EaseMove = CreateDefaultSubobject<UEaseMoveComponent>(TEXT("EaseMove"));
 	AddOwnedComponent(EaseMove);
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-
 }
 
 
@@ -24,16 +23,17 @@ AElevatorBase::AElevatorBase()
 void AElevatorBase::BeginPlay()
 {
 	Super::BeginPlay();
-	InitManagable();
 	EaseMove->ArrivalDelegate.AddUniqueDynamic(this, &AElevatorBase::OnArrivial);
 }
 
 
 void AElevatorBase::OnArrivial_Implementation() {
 	FElevatorArrivalSignature ArrivalDelegates = State == ElevatorState::kUp ? ArrivalUpDelegates : ArrivalDownDelegates;
-	ArrivalDelegates.Broadcast(TargetGateIdx, IdxInManager);
 	State = ElevatorState::kStopped;
+	int OldTargetGateIdx = TargetGateIdx;
 	TargetGateIdx = -1;
+
+	ArrivalDelegates.Broadcast(OldTargetGateIdx, IdxInManager);
 }
 
 
@@ -47,7 +47,7 @@ void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
 
 	if (TargetPos.Z > CurrentHeight)
 		State = ElevatorState::kUp;
-	else if (TargetPos.Z > CurrentHeight)
+	else if (TargetPos.Z < CurrentHeight)
 		State = ElevatorState::kDown;
 	else
 		State = ElevatorState::kStopped;

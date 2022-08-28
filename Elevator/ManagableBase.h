@@ -17,19 +17,20 @@ public:
 	// Sets default values for this actor's properties
 	AManagableBase();
 	
-	UFUNCTION(BlueprintCallable)
-		void SetManager(AElevatorManager* NewManager);
+	void SetManager(AElevatorManager* NewManager);
+	virtual void PreInitializeComponents() override;
+	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintSetter = SetManager)
-		AElevatorManager* Manager = nullptr;
-	int IdxInManager;
-
 	UFUNCTION()
 		virtual int GetIdxInManager()
 		PURE_VIRTUAL(AManagableBase::GetIdxInManager, return -1;);
+
+	int IdxInManager;
+	AElevatorManager* Manager = nullptr;
 
 public:	
 	// Called every frame

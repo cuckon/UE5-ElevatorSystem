@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ElevatorManagable.h"
+#include "ManagableBase.h"
 #include "GateBase.generated.h"
 
 
 UCLASS(ClassGroup = Elevator)
-class ELEVATOR_API AGateBase : public AActor, public ElevatorManagable
+class ELEVATOR_API AGateBase : public AManagableBase
 {
 	GENERATED_BODY()
 	

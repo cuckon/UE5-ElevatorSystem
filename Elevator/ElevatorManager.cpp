@@ -33,14 +33,13 @@ void AElevatorManager::AddAllElevators()
 	UE_LOG(LogTemp, Log, TEXT("AddAllElevators"));
 }
 
-// Called when the game starts or when spawned
-void AElevatorManager::BeginPlay()
+void AElevatorManager::PreInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PreInitializeComponents();
 
 	Algo::Sort(Gates, [](const AGateBase* A, const AGateBase* B) {
 		return A->GetActorLocation().Z < B->GetActorLocation().Z;
-	});
+		});
 
 	for (auto Elevator : Elevators) {
 		Elevator->SetManager(this);
@@ -52,7 +51,13 @@ void AElevatorManager::BeginPlay()
 		Gate->PendingDownDelegates.AddDynamic(this, &AElevatorManager::OnPendingDown);
 		Gate->PendingUpDelegates.AddDynamic(this, &AElevatorManager::OnPendingUp);
 	}
+	UE_LOG(LogInit, Log, TEXT("PreInitializeComponents"));
+}
 
+// Called when the game starts or when spawned
+void AElevatorManager::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 
@@ -68,20 +73,19 @@ void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
 		return;
 
 	Elevators[ElevatorIdx]->MoveToGate(GateIdx, IsUp ? ElevatorState::kUp : ElevatorState::kDown);
-
-	//for (auto Elevator : Elevators)
-	//	Schedule(Elevator, IsUp ? ElevatorState::kUp : ElevatorState::kDown);
 }
 
 int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 {
-	bool CanPickTheUp;
+	// TODO: Choose the nearest available elevator.
+	//bool CanPickTheUp;
 	for (int i = 0; i < Elevators.Num(); i++) {
 		auto Elevator = Elevators[i];
-
-		CanPickTheUp = Elevator->GetState() == ElevatorState::kUp || Elevator->GetState() == ElevatorState::kStopped;
-		if (CanPickTheUp == ForUp)
+		if (Elevator->GetState() == ElevatorState::kStopped)
 			return i;
+		/*CanPickTheUp = Elevator->GetState() == ElevatorState::kUp;
+		if (CanPickTheUp == ForUp)
+			return i;*/
 	}
 
 	return kNoElevatorAvailableIdx;
@@ -143,14 +147,15 @@ void AElevatorManager::OnArrivalDown_Implementation(int GateIdx, int ElevatorIdx
 void AElevatorManager::OnAnyArrival(int GateIdx, int ElevatorIdx)
 {
 	bool MovingUp = Elevators[ElevatorIdx]->GetReasonOfMoving() == ElevatorState::kUp;
-	auto PendingGates = (MovingUp ? PendingGatesUp : PendingGatesDown);
+	auto& PendingGates = (MovingUp ? PendingGatesUp : PendingGatesDown);
 	PendingGates.RemoveAt(0);
+	((*Gates[GateIdx]).*(MovingUp ? &AGateBase::StartedUp : &AGateBase::StartedDown))();
 
 	// Ready to fire to the next gate. Pick the gate
 	TArray<int> UntakenGates;
 	GetUntakenPendingGates(MovingUp, UntakenGates);
 
-	if (!UntakenGates.IsEmpty()) {
+	if (UntakenGates.IsEmpty()) {
 		MovingUp = !MovingUp;
 		GetUntakenPendingGates(MovingUp, UntakenGates);
 	}

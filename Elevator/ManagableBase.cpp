@@ -21,12 +21,18 @@ void AManagableBase::SetManager(AElevatorManager* NewManager)
 void AManagableBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	if (!Manager) {
-		UE_LOG(LogInit, Fatal, TEXT("Manager is not set"));
-		return;
+void AManagableBase::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+	if (Manager) {
+		IdxInManager = GetIdxInManager();
 	}
-	IdxInManager = GetIdxInManager();	
+	else if (GetWorld()->IsGameWorld()){
+		UE_LOG(LogInit, Fatal, TEXT("Manager is not set"));
+	}
 }
 
 // Called every frame
