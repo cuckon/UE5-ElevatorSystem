@@ -53,6 +53,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
 		void OnPendingDown(int GateIdx);
 
+	// Move to next proper gate. While be consistent with current moving direction.
+	// SplitGateIdx : Should be the gate that scan
+	void Schedule(int ElevatorIdx, bool PreferUp, int SplitGateIdx);
+
 	void OnArrivalUp_Implementation(int, int);
 	void OnArrivalDown_Implementation(int, int);
 	void OnAnyArrival(int, int);
@@ -63,8 +67,6 @@ protected:
 	bool CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx) const;
 	void GetUntakenPendingGates(bool Up, TArray<int>& out) const;
 	void GetTakenPendingGates(bool Up, TArray<int>& out) const;
-
-	TArray<int> PendingGatesUp, PendingGatesDown;
 
 public:	
 	// Called every frame

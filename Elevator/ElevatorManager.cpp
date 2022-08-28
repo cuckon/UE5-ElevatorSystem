@@ -62,12 +62,6 @@ void AElevatorManager::BeginPlay()
 
 
 void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
-	auto& GateIndices = IsUp ? PendingGatesUp : PendingGatesDown;
-	GateIndices.Add(GateIdx);
-	GateIndices.Sort();
-	if (!IsUp)
-		Algo::Reverse(GateIndices);
-
 	int ElevatorIdx = BestElevatorForPendingGate(GateIdx, IsUp);
 	if (ElevatorIdx == kNoElevatorAvailableIdx)
 		return;
@@ -78,6 +72,8 @@ void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
 int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 {
 	// TODO: Choose the nearest available elevator.
+	// TODO: Insert GateIdx if can pick it up.
+
 	//bool CanPickTheUp;
 	for (int i = 0; i < Elevators.Num(); i++) {
 		auto Elevator = Elevators[i];
@@ -89,6 +85,39 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 	}
 
 	return kNoElevatorAvailableIdx;
+}
+
+// Find next index to go using LOOK algrithm. Find A first then B then A.
+// Returns a std::tuple of the found idx and direction to consume.
+// Returns -1 if A and B are both empty.
+// Reference: https://www.youtube.com/watch?v=cxwUdPpva2Y
+std::tuple<int, bool> LookNext(const TArray<int>& A, const TArray<int>& B, int SplitIdx, bool IsUp) {
+	if (A.IsEmpty() && B.IsEmpty())
+		return std::make_tuple(-1, false);
+
+	for (int i = 0; i < A.Num(); i++) 
+		if (IsUp && (A[i] > SplitIdx) || !IsUp && (A[i] < SplitIdx))
+			return std::make_tuple(A[i], IsUp);
+
+	if (!B.IsEmpty())
+		return std::make_tuple(B[0], !IsUp);
+
+	return std::make_tuple(A[0], IsUp);
+}
+
+void AElevatorManager::Schedule(int ElevatorIdx, bool PreferUp, int SplitGateIdx)
+{
+	TArray<int> UntakenGatesUp, UntakenGatesDown;
+	GetUntakenPendingGates(true, UntakenGatesUp);
+	GetUntakenPendingGates(false, UntakenGatesDown);
+
+	if (UntakenGatesUp.IsEmpty() && UntakenGatesDown.IsEmpty())
+		return;
+	
+	auto [NextIdx, GoUp] = PreferUp ? LookNext(UntakenGatesUp, UntakenGatesDown, SplitGateIdx, true)
+		: LookNext(UntakenGatesDown, UntakenGatesUp, SplitGateIdx, false);
+
+	Elevators[ElevatorIdx]->MoveToGate(NextIdx, GoUp ? ElevatorState::kUp : ElevatorState::kDown);
 }
 
 bool AElevatorManager::CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx) const
@@ -103,16 +132,23 @@ bool AElevatorManager::CanPickGateOnThisRide(AElevatorBase* Elevator, int GateId
 	return State == ElevatorState::kUp && GateHeight > CurrentHeight || State == ElevatorState::kDown && GateHeight < CurrentHeight;
 }
 
+// Returns the unoccupied gates indices. If Up is false, the order is reversed.
 void AElevatorManager::GetUntakenPendingGates(bool Up, TArray<int>& out) const
 {
 	TArray<int> Taken;
 	GetTakenPendingGates(Up, Taken);
-
 	out.Empty();
-	for (auto GateIdx : (Up ? PendingGatesUp : PendingGatesDown)) {
-		if (!Taken.Contains(GateIdx))
-			out.Add(GateIdx);
+
+	for (int i = 0; i < Gates.Num(); i++) {
+		if (!(Up ? Gates[i]->IsPendingUp : Gates[i]->IsPendingDown))
+			continue;
+		if (Taken.Contains(i))
+			continue;
+		out.Add(i);
 	}
+	if (!Up)
+		Algo::Reverse(out);
+	
 }
 
 void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const
@@ -147,20 +183,8 @@ void AElevatorManager::OnArrivalDown_Implementation(int GateIdx, int ElevatorIdx
 void AElevatorManager::OnAnyArrival(int GateIdx, int ElevatorIdx)
 {
 	bool MovingUp = Elevators[ElevatorIdx]->GetReasonOfMoving() == ElevatorState::kUp;
-	auto& PendingGates = (MovingUp ? PendingGatesUp : PendingGatesDown);
-	PendingGates.RemoveAt(0);
 	((*Gates[GateIdx]).*(MovingUp ? &AGateBase::StartedUp : &AGateBase::StartedDown))();
-
-	// Ready to fire to the next gate. Pick the gate
-	TArray<int> UntakenGates;
-	GetUntakenPendingGates(MovingUp, UntakenGates);
-
-	if (UntakenGates.IsEmpty()) {
-		MovingUp = !MovingUp;
-		GetUntakenPendingGates(MovingUp, UntakenGates);
-	}
-	if (!UntakenGates.IsEmpty())
-		Elevators[ElevatorIdx]->MoveToGate(UntakenGates[0], MovingUp ? ElevatorState::kUp : ElevatorState::kDown);
+	Schedule(ElevatorIdx, MovingUp, GateIdx);
 }
 
 
