@@ -40,8 +40,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Elevator")
 		float CurrentSpeed = 0.0;
 
+	FVector GetIntermediatePosition() const { return IntermediatePosition; }
 
-	// DEBUG
+	// DEBUG helpers
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
 		bool DrawIntermediatePosition = true;
 

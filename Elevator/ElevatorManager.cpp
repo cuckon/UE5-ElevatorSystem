@@ -72,16 +72,22 @@ void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
 int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 {
 	// TODO: Choose the nearest available elevator.
-	// TODO: Insert GateIdx if can pick it up.
 
-	//bool CanPickTheUp;
 	for (int i = 0; i < Elevators.Num(); i++) {
 		auto Elevator = Elevators[i];
+
+		// It's always ready if the elevator is stopped.
 		if (Elevator->GetState() == ElevatorState::kStopped)
 			return i;
-		/*CanPickTheUp = Elevator->GetState() == ElevatorState::kUp;
-		if (CanPickTheUp == ForUp)
-			return i;*/
+
+		// Check if can pick it up on its way.
+		if (ForUp != (Elevator->GetState() == ElevatorState::kUp))
+			continue;
+
+		float IntermediateHeight = Elevator->EaseMove->GetIntermediatePosition().Z;
+		float GateHeight = Gates[GateIdx]->GetActorLocation().Z;
+		if (ForUp && IntermediateHeight < GateHeight || !ForUp && IntermediateHeight > GateHeight)
+			return i;
 	}
 
 	return kNoElevatorAvailableIdx;
@@ -148,7 +154,6 @@ void AElevatorManager::GetUntakenPendingGates(bool Up, TArray<int>& out) const
 	}
 	if (!Up)
 		Algo::Reverse(out);
-	
 }
 
 void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const

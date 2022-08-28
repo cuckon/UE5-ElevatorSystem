@@ -36,7 +36,6 @@ void AElevatorBase::OnArrivial_Implementation() {
 	ArrivalDelegates.Broadcast(OldTargetGateIdx, IdxInManager);
 }
 
-
 void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
 	TargetGateIdx = NewTargetGateIdx;
 
@@ -55,12 +54,10 @@ void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
 	ReasonOfMoving = Reason;
 }
 
-
 int AElevatorBase::GetIdxInManager()
 {
 	return Manager->Elevators.Find(this);
 }
-
 
 // Called every frame
 void AElevatorBase::Tick(float DeltaTime)
