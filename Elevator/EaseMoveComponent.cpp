@@ -22,10 +22,9 @@ void UEaseMoveComponent::MoveTo(const FVector& Position)
 {
 	if (IsArrived)
 		BeginMoveDelegate.Broadcast();
-	IsArrived = false;
-
-	TargetPosition = Position;
 	
+	TargetPosition = Position;
+	IsArrived = false;
 }
 
 // Called when the game starts

@@ -33,12 +33,6 @@ void AElevatorManager::AddAllElevators()
 	UE_LOG(LogTemp, Log, TEXT("AddAllElevators"));
 }
 
-void AElevatorManager::Schedule(AElevatorBase* Elevator, int GateIdx, bool IsUp)
-{
-	Elevator->MoveToGate(GateIdx, IsUp ? ElevatorState::kUp : ElevatorState::kDown);
-	(IsUp ? PendingGatesUpTaken : PendingGatesDownTaken).Add(GateIdx);
-}
-
 // Called when the game starts or when spawned
 void AElevatorManager::BeginPlay()
 {
@@ -74,7 +68,6 @@ void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
 		return;
 
 	Elevators[ElevatorIdx]->MoveToGate(GateIdx, IsUp ? ElevatorState::kUp : ElevatorState::kDown);
-	(IsUp ? PendingGatesUpTaken : PendingGatesDownTaken).Add(GateIdx);
 
 	//for (auto Elevator : Elevators)
 	//	Schedule(Elevator, IsUp ? ElevatorState::kUp : ElevatorState::kDown);
@@ -108,11 +101,22 @@ bool AElevatorManager::CanPickGateOnThisRide(AElevatorBase* Elevator, int GateId
 
 void AElevatorManager::GetUntakenPendingGates(bool Up, TArray<int>& out) const
 {
-	const auto& GatesTaken = (Up ? PendingGatesUpTaken : PendingGatesDownTaken);
+	TArray<int> Taken;
+	GetTakenPendingGates(Up, Taken);
+
+	out.Empty();
 	for (auto GateIdx : (Up ? PendingGatesUp : PendingGatesDown)) {
-		if (!GatesTaken.Contains(GateIdx))
+		if (!Taken.Contains(GateIdx))
 			out.Add(GateIdx);
 	}
+}
+
+void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const
+{
+	out.Empty();
+	for (auto Elevator : Elevators) 
+		if (Elevator->GetState() != ElevatorState::kStopped)
+			out.Add(Elevator->TargetGateIdx);
 }
 
 
@@ -141,7 +145,6 @@ void AElevatorManager::OnAnyArrival(int GateIdx, int ElevatorIdx)
 	bool MovingUp = Elevators[ElevatorIdx]->GetReasonOfMoving() == ElevatorState::kUp;
 	auto PendingGates = (MovingUp ? PendingGatesUp : PendingGatesDown);
 	PendingGates.RemoveAt(0);
-	(MovingUp ? PendingGatesUpTaken : PendingGatesDownTaken).Remove(GateIdx);  // Change the pending to dynamic!!!!
 
 	// Ready to fire to the next gate. Pick the gate
 	TArray<int> UntakenGates;
@@ -151,7 +154,8 @@ void AElevatorManager::OnAnyArrival(int GateIdx, int ElevatorIdx)
 		MovingUp = !MovingUp;
 		GetUntakenPendingGates(MovingUp, UntakenGates);
 	}
-	Schedule(Elevators[ElevatorIdx], GateIdx, MovingUp);
+	if (!UntakenGates.IsEmpty())
+		Elevators[ElevatorIdx]->MoveToGate(UntakenGates[0], MovingUp ? ElevatorState::kUp : ElevatorState::kDown);
 }
 
 

@@ -4,6 +4,7 @@
 #include "GateBase.h"
 #include "ElevatorManager.h"
 
+PRAGMA_DISABLE_OPTIMIZATION
 
 // Sets default values
 AGateBase::AGateBase()

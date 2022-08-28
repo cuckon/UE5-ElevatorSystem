@@ -33,6 +33,7 @@ void AElevatorBase::OnArrivial_Implementation() {
 	FElevatorArrivalSignature ArrivalDelegates = State == ElevatorState::kUp ? ArrivalUpDelegates : ArrivalDownDelegates;
 	ArrivalDelegates.Broadcast(TargetGateIdx, IdxInManager);
 	State = ElevatorState::kStopped;
+	TargetGateIdx = -1;
 }
 
 

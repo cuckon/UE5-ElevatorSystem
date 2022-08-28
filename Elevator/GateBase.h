@@ -8,7 +8,7 @@
 #include "GateBase.generated.h"
 
 
-UCLASS()
+UCLASS(ClassGroup = Elevator)
 class ELEVATOR_API AGateBase : public AActor, public ElevatorManagable
 {
 	GENERATED_BODY()

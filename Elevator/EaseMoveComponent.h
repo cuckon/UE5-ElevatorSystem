@@ -7,7 +7,7 @@
 #include "EaseMoveComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Movement), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=Movement, meta=(BlueprintSpawnableComponent) )
 class ELEVATOR_API UEaseMoveComponent : public UActorComponent
 {
 	GENERATED_BODY()

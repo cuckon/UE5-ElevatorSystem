@@ -11,7 +11,7 @@ class AElevatorBase;
 class AGateBase;
 
 
-UCLASS()
+UCLASS(ClassGroup = Elevator)
 class ELEVATOR_API AElevatorManager : public AActor
 {
 	GENERATED_BODY()
@@ -33,7 +33,7 @@ public:
 		void AddAllElevators();
 
 protected:
-	void Schedule(AElevatorBase* Elevator, int GateIdx, bool IsUp);
+	//void Schedule(AElevatorBase* Elevator, int GateIdx, bool IsUp);
 
 	virtual void BeginPlay() override;
 
@@ -60,9 +60,9 @@ protected:
 	int BestElevatorForPendingGate(int GateIdx, bool ForUp) const;
 	bool CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx) const;
 	void GetUntakenPendingGates(bool Up, TArray<int>& out) const;
+	void GetTakenPendingGates(bool Up, TArray<int>& out) const;
 
 	TArray<int> PendingGatesUp, PendingGatesDown;
-	TSet<int> PendingGatesUpTaken, PendingGatesDownTaken;
 
 public:	
 	// Called every frame

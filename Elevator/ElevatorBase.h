@@ -13,7 +13,7 @@ class UEaseMoveComponent;
 class AElevatorManager;
 
 
-UCLASS()
+UCLASS(ClassGroup=Elevator)
 class ELEVATOR_API AElevatorBase : public AActor, public ElevatorManagable
 {
 	GENERATED_BODY()
