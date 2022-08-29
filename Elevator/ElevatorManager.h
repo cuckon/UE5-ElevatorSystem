@@ -64,7 +64,6 @@ protected:
 	void OnPendingDown_Implementation(int);
 	void OnAnyPending(bool IsUp, int GateIdx);
 	int BestElevatorForPendingGate(int GateIdx, bool ForUp) const;
-	bool CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx) const;
 	void GetUntakenPendingGates(bool Up, TArray<int>& out) const;
 	void GetTakenPendingGates(bool Up, TArray<int>& out) const;
 

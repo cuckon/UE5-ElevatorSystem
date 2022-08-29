@@ -126,18 +126,6 @@ void AElevatorManager::Schedule(int ElevatorIdx, bool PreferUp, int SplitGateIdx
 	Elevators[ElevatorIdx]->MoveToGate(NextIdx, GoUp ? ElevatorState::kUp : ElevatorState::kDown);
 }
 
-bool AElevatorManager::CanPickGateOnThisRide(AElevatorBase* Elevator, int GateIdx) const
-{
-	ElevatorState State = Elevator->GetState();
-	if (State == ElevatorState::kStopped)
-		return true;
-
-	float GateHeight = Gates[GateIdx]->GetActorLocation().Z;
-	float CurrentHeight = Elevator->GetActorLocation().Z;
-	
-	return State == ElevatorState::kUp && GateHeight > CurrentHeight || State == ElevatorState::kDown && GateHeight < CurrentHeight;
-}
-
 // Returns the unoccupied gates indices. If Up is false, the order is reversed.
 void AElevatorManager::GetUntakenPendingGates(bool Up, TArray<int>& out) const
 {
