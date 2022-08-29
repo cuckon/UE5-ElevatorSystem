@@ -69,16 +69,35 @@ void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
 	Elevators[ElevatorIdx]->MoveToGate(GateIdx, IsUp ? ElevatorState::kUp : ElevatorState::kDown);
 }
 
+int AElevatorManager::NearestElevatorToGate(int GateIdx, TArray<int>& IdleElevatorIndices) const
+{
+	float GateHeight = Gates[GateIdx]->GetActorLocation().Z;
+	Algo::Sort(
+		IdleElevatorIndices,
+		[&](int iA, int iB) {
+			float HeightA = Elevators[iA]->GetActorLocation().Z;
+			float HeightB = Elevators[iB]->GetActorLocation().Z;
+			return FMath::Abs(HeightA - GateHeight) < FMath::Abs(HeightB - GateHeight);
+		}
+	);
+	return IdleElevatorIndices[0];
+}
+
 int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 {
-	// TODO: Choose the nearest available elevator.
+	TArray<int> ElevatorIndices;
 
+	// Find nearest stopped elevator first.
+	for (int i = 0; i < Elevators.Num(); i++)
+		if (Elevators[i]->GetState() == ElevatorState::kStopped)
+			ElevatorIndices.Add(i);
+
+	if (!ElevatorIndices.IsEmpty())
+		return NearestElevatorToGate(GateIdx, ElevatorIndices);
+
+	// If that fails, finds nearest elevators that can pick up the gate.
 	for (int i = 0; i < Elevators.Num(); i++) {
 		auto Elevator = Elevators[i];
-
-		// It's always ready if the elevator is stopped.
-		if (Elevator->GetState() == ElevatorState::kStopped)
-			return i;
 
 		// Check if can pick it up on its way.
 		if (ForUp != (Elevator->GetState() == ElevatorState::kUp))
@@ -87,8 +106,10 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 		float IntermediateHeight = Elevator->EaseMove->GetIntermediatePosition().Z;
 		float GateHeight = Gates[GateIdx]->GetActorLocation().Z;
 		if (ForUp && IntermediateHeight < GateHeight || !ForUp && IntermediateHeight > GateHeight)
-			return i;
+			ElevatorIndices.Add(i);
 	}
+	if (!ElevatorIndices.IsEmpty())
+		return NearestElevatorToGate(GateIdx, ElevatorIndices);
 
 	return kNoElevatorAvailableIdx;
 }

@@ -63,6 +63,7 @@ protected:
 	void OnPendingUp_Implementation(int);
 	void OnPendingDown_Implementation(int);
 	void OnAnyPending(bool IsUp, int GateIdx);
+	int NearestElevatorToGate(int GateIdx, TArray<int>& ElevatorIndices) const;
 	int BestElevatorForPendingGate(int GateIdx, bool ForUp) const;
 	void GetUntakenPendingGates(bool Up, TArray<int>& out) const;
 	void GetTakenPendingGates(bool Up, TArray<int>& out) const;
