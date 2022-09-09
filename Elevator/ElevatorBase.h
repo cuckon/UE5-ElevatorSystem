@@ -20,6 +20,7 @@ class ELEVATOR_API AElevatorBase : public AManagableBase
 	
 public:	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FElevatorArrivalSignature, int, GateIdx, int, ElevatorIdx);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FElevatorReadyToGoSignature, int, ElevatorIdx);
 
 	// Sets default values for this actor's properties
 	AElevatorBase();
@@ -33,12 +34,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		ElevatorState GetReasonOfMoving() const { return ReasonOfMoving; }
 
+	UFUNCTION(BlueprintCallable, Category = "Elevator")
+		void ReadyToGo() const { ReadyToGoDelegates.Broadcast(GetIdxInManager()); UE_LOG(LogInit, Log, TEXT("Ready To go: %d."), GateIdxWhenStopped); }
+
 	// Move to `NewTargetGateIdx`, switch to `Reason` when arrived.
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		void MoveToGate(int NewTargetGateIdx, ElevatorState Reason);
 
-	FElevatorArrivalSignature ArrivalUpDelegates, ArrivalDownDelegates;
-	int TargetGateIdx = -1;
+	UPROPERTY(BlueprintAssignable, Category = "Elevator")
+		FElevatorArrivalSignature ArrivalUpDelegates;
+
+	UPROPERTY(BlueprintAssignable, Category = "Elevator")
+		FElevatorArrivalSignature ArrivalDownDelegates;
+
+	UPROPERTY(BlueprintAssignable, Category = "Elevator")
+		FElevatorReadyToGoSignature ReadyToGoDelegates;
+
+	int GateIdxWhenStopped = -1;
 
 protected:
 	// Called when the game starts or when spawned
@@ -48,7 +60,7 @@ protected:
 		void OnArrivial();
 
 	void OnArrivial_Implementation();
-	virtual int GetIdxInManager() override;
+	virtual int GetIdxInManager() const override;
 
 	ElevatorState State = ElevatorState::kStopped;
 

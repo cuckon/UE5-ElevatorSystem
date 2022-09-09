@@ -11,12 +11,6 @@ AManagableBase::AManagableBase()
 
 }
 
-void AManagableBase::SetManager(AElevatorManager* NewManager)
-{
-	Manager = NewManager;
-	UE_LOG(LogInit, Log, TEXT("void AManagableBase::SetManager(AElevatorManager* NewManager)"));
-}
-
 // Called when the game starts or when spawned
 void AManagableBase::BeginPlay()
 {

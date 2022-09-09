@@ -30,18 +30,16 @@ void AElevatorBase::BeginPlay()
 void AElevatorBase::OnArrivial_Implementation() {
 	FElevatorArrivalSignature ArrivalDelegates = State == ElevatorState::kUp ? ArrivalUpDelegates : ArrivalDownDelegates;
 	State = ElevatorState::kStopped;
-	int OldTargetGateIdx = TargetGateIdx;
-	TargetGateIdx = -1;
-
+	int OldTargetGateIdx = GateIdxWhenStopped;
 	ArrivalDelegates.Broadcast(OldTargetGateIdx, IdxInManager);
 }
 
 void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
-	TargetGateIdx = NewTargetGateIdx;
+	GateIdxWhenStopped = NewTargetGateIdx;
 
 	FVector TargetPos = GetActorLocation();
 	float CurrentHeight = TargetPos.Z;
-	TargetPos.Z = Manager->Gates[TargetGateIdx]->GetActorLocation().Z;
+	TargetPos.Z = Manager->Gates[GateIdxWhenStopped]->GetActorLocation().Z;
 	EaseMove->MoveTo(TargetPos);
 
 	if (TargetPos.Z > CurrentHeight)
@@ -54,9 +52,9 @@ void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
 	ReasonOfMoving = Reason;
 }
 
-int AElevatorBase::GetIdxInManager()
+int AElevatorBase::GetIdxInManager() const
 {
-	return Manager->Elevators.Find(this);
+	return Manager->Elevators.Find(const_cast<AElevatorBase*>(this));
 }
 
 // Called every frame

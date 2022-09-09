@@ -16,8 +16,10 @@ class ELEVATOR_API AManagableBase : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AManagableBase();
-	
-	void SetManager(AElevatorManager* NewManager);
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
+		AElevatorManager* Manager = nullptr;
+
 	virtual void PreInitializeComponents() override;
 	
 
@@ -26,11 +28,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-		virtual int GetIdxInManager()
+		virtual int GetIdxInManager() const
 		PURE_VIRTUAL(AManagableBase::GetIdxInManager, return -1;);
 
 	int IdxInManager;
-	AElevatorManager* Manager = nullptr;
 
 public:	
 	// Called every frame

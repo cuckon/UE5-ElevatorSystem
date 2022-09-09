@@ -53,13 +53,16 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
 		void OnPendingDown(int GateIdx);
 
+	UFUNCTION(BlueprintCallable, Category = "Elevator")
+		void OnElevatorReadyToGo(int ElevatorIdx);
+
+
 	// Move to next proper gate. While be consistent with current moving direction.
 	// SplitGateIdx : Should be the gate that scan
 	void Schedule(int ElevatorIdx, bool PreferUp, int SplitGateIdx);
 
 	void OnArrivalUp_Implementation(int, int);
 	void OnArrivalDown_Implementation(int, int);
-	void OnAnyArrival(int, int);
 	void OnPendingUp_Implementation(int);
 	void OnPendingDown_Implementation(int);
 	void OnAnyPending(bool IsUp, int GateIdx);

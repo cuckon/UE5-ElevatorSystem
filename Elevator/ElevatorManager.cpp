@@ -42,12 +42,13 @@ void AElevatorManager::PreInitializeComponents()
 		});
 
 	for (auto Elevator : Elevators) {
-		Elevator->SetManager(this);
+		Elevator->Manager = this;
 		Elevator->ArrivalUpDelegates.AddDynamic(this, &AElevatorManager::OnArrivalUp);
 		Elevator->ArrivalDownDelegates.AddDynamic(this, &AElevatorManager::OnArrivalDown);
+		Elevator->ReadyToGoDelegates.AddDynamic(this, &AElevatorManager::OnElevatorReadyToGo);
 	}
 	for (auto Gate : Gates) {
-		Gate->SetManager(this);
+		Gate->Manager = this;
 		Gate->PendingDownDelegates.AddDynamic(this, &AElevatorManager::OnPendingDown);
 		Gate->PendingUpDelegates.AddDynamic(this, &AElevatorManager::OnPendingUp);
 	}
@@ -170,7 +171,7 @@ void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const
 	out.Empty();
 	for (auto Elevator : Elevators) 
 		if (Elevator->GetState() != ElevatorState::kStopped)
-			out.Add(Elevator->TargetGateIdx);
+			out.Add(Elevator->GateIdxWhenStopped);
 }
 
 
@@ -186,17 +187,18 @@ void AElevatorManager::OnPendingDown_Implementation(int GateIdx)
 
 void AElevatorManager::OnArrivalUp_Implementation(int GateIdx, int ElevatorIdx)
 {
-	OnAnyArrival(GateIdx, ElevatorIdx);
+	//OnAnyArrival(GateIdx, ElevatorIdx);
 }
 
 void AElevatorManager::OnArrivalDown_Implementation(int GateIdx, int ElevatorIdx)
 {
-	OnAnyArrival(GateIdx, ElevatorIdx);
+	//OnAnyArrival(GateIdx, ElevatorIdx);
 }
 
-void AElevatorManager::OnAnyArrival(int GateIdx, int ElevatorIdx)
+void AElevatorManager::OnElevatorReadyToGo(int ElevatorIdx)
 {
 	bool MovingUp = Elevators[ElevatorIdx]->GetReasonOfMoving() == ElevatorState::kUp;
+	int GateIdx = Elevators[ElevatorIdx]->GateIdxWhenStopped;
 	((*Gates[GateIdx]).*(MovingUp ? &AGateBase::StartedUp : &AGateBase::StartedDown))();
 	Schedule(ElevatorIdx, MovingUp, GateIdx);
 }

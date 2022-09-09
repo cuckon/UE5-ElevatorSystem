@@ -42,9 +42,9 @@ void AGateBase::StartedDown_Implementation()
 	IsPendingDown = false;
 }
 
-int AGateBase::GetIdxInManager()
+int AGateBase::GetIdxInManager() const
 {
-	return Manager->Gates.Find(this);;
+	return Manager->Gates.Find(const_cast<AGateBase*>(this));
 }
 
 // Called every frame

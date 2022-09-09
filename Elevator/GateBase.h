@@ -48,7 +48,7 @@ protected:
 	void OnPendingDown_Implementation();
 	void StartedUp_Implementation();
 	void StartedDown_Implementation();
-	virtual int GetIdxInManager() override;
+	virtual int GetIdxInManager() const override;
 
 public:	
 	// Called every frame

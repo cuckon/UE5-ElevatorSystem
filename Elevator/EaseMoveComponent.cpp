@@ -29,6 +29,7 @@ void UEaseMoveComponent::MoveTo(const FVector& Position)
 void UEaseMoveComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	IntermediatePosition = GetOwner()->GetActorLocation();
 
 	// ...
 	UE_LOG(LogTemp, Log, TEXT("Speed: %f, LagS: %d"), Speed, LagSteps);
