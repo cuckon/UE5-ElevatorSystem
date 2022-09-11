@@ -20,9 +20,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
 		AElevatorManager* Manager = nullptr;
 
-	virtual void PreInitializeComponents() override;
-	
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

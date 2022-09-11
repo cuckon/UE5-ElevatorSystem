@@ -8,25 +8,16 @@ PRAGMA_DISABLE_OPTIMIZATION
 // Sets default values
 AManagableBase::AManagableBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void AManagableBase::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AManagableBase::PreInitializeComponents()
-{
-	Super::PreInitializeComponents();
-
 	if (Manager) {
 		IdxInManager = GetIdxInManager();
 	}
-	else if (GetWorld()->IsGameWorld()){
+	else if (GetWorld()->IsGameWorld()) {
 		UE_LOG(LogInit, Warning, TEXT("Manager is not set"));
 	}
 }
