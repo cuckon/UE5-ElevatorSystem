@@ -86,9 +86,13 @@ int AElevatorManager::NearestElevatorToGate(int GateIdx, TArray<int>& IdleElevat
 
 int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 {
-	TArray<int> ElevatorIndices;
+	// 1. See if there's elevators happen to be at that gate and haven't shut the door completely.
+	for (int i = 0; i < Elevators.Num(); i++)
+		if (Elevators[i]->State == ElevatorState::kUnready && Elevators[i]->GateIdxWhenStopped==GateIdx)
+			return i;
 
-	// Find nearest stopped elevator first.
+	// 2. Try to find nearest standby elevators.
+	TArray<int> ElevatorIndices;
 	for (int i = 0; i < Elevators.Num(); i++)
 		if (Elevators[i]->State == ElevatorState::kStandby)
 			ElevatorIndices.Add(i);
@@ -96,7 +100,7 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 	if (!ElevatorIndices.IsEmpty())
 		return NearestElevatorToGate(GateIdx, ElevatorIndices);
 
-	// If that fails, finds nearest elevators that can pick up the gate.
+	// 3. Try to finds nearest elevators that can pick up the gate.
 	for (int i = 0; i < Elevators.Num(); i++) {
 		auto Elevator = Elevators[i];
 

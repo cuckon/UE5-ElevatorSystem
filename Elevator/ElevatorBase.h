@@ -48,7 +48,7 @@ public:
 		FElevatorReadyToGoSignature ReadyToGoDelegates;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnArrivial();
+		void OnArrival();
 
 	UPROPERTY(BlueprintReadWrite, Category = "Elevator")
 		ElevatorState State = ElevatorState::kStandby;
@@ -58,7 +58,7 @@ public:
 
 
 	void MoveToGate_Implementation(int NewTargetGateIdx, ElevatorState Reason);
-	void OnArrivial_Implementation();
+	void OnArrival_Implementation();
 
 protected:
 	// Called when the game starts or when spawned
