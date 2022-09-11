@@ -29,12 +29,12 @@ void AElevatorBase::BeginPlay()
 
 void AElevatorBase::OnArrivial_Implementation() {
 	FElevatorArrivalSignature ArrivalDelegates = State == ElevatorState::kUp ? ArrivalUpDelegates : ArrivalDownDelegates;
-	State = ElevatorState::kStopped;
+	State = ElevatorState::kStandby;
 	int OldTargetGateIdx = GateIdxWhenStopped;
 	ArrivalDelegates.Broadcast(OldTargetGateIdx, IdxInManager);
 }
 
-void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
+void AElevatorBase::MoveToGate_Implementation(int NewTargetGateIdx, ElevatorState Reason) {
 	GateIdxWhenStopped = NewTargetGateIdx;
 
 	FVector TargetPos = GetActorLocation();
@@ -47,7 +47,7 @@ void AElevatorBase::MoveToGate(int NewTargetGateIdx, ElevatorState Reason) {
 	else if (TargetPos.Z < CurrentHeight)
 		State = ElevatorState::kDown;
 	else
-		State = ElevatorState::kStopped;
+		State = ElevatorState::kStandby;
 
 	ReasonOfMoving = Reason;
 }

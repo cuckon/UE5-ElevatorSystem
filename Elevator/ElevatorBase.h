@@ -29,16 +29,13 @@ public:
 		UEaseMoveComponent* EaseMove;
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
-		ElevatorState GetState() const { return State; }
-
-	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		ElevatorState GetReasonOfMoving() const { return ReasonOfMoving; }
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		void ReadyToGo() const { ReadyToGoDelegates.Broadcast(GetIdxInManager()); UE_LOG(LogInit, Log, TEXT("Ready To go: %d."), GateIdxWhenStopped); }
 
 	// Move to `NewTargetGateIdx`, switch to `Reason` when arrived.
-	UFUNCTION(BlueprintCallable, Category = "Elevator")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Elevator")
 		void MoveToGate(int NewTargetGateIdx, ElevatorState Reason);
 
 	UPROPERTY(BlueprintAssignable, Category = "Elevator")
@@ -50,19 +47,24 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Elevator")
 		FElevatorReadyToGoSignature ReadyToGoDelegates;
 
+	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
+		void OnArrivial();
+
+	UPROPERTY(BlueprintReadWrite, Category = "Elevator")
+		ElevatorState State = ElevatorState::kStandby;
+
+
 	int GateIdxWhenStopped = -1;
+
+
+	void MoveToGate_Implementation(int NewTargetGateIdx, ElevatorState Reason);
+	void OnArrivial_Implementation();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnArrivial();
-
-	void OnArrivial_Implementation();
 	virtual int GetIdxInManager() const override;
-
-	ElevatorState State = ElevatorState::kStopped;
 
 	ElevatorState ReasonOfMoving;  // Switch to this state after arrival
 

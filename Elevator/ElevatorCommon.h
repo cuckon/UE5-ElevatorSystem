@@ -5,5 +5,8 @@ UENUM(BlueprintType)
 enum class ElevatorState : uint8 {
 	kUp UMETA(DisplayName = "Up"),
 	kDown UMETA(DisplayName = "Down"),
-	kStopped UMETA(DisplayName = "Stopped")
+	kStandby UMETA(DisplayName = "Stopped"),
+
+	// In the state of closing/opening doors
+	kUnready UMETA(DisplayName = "Unready")
 };

@@ -90,7 +90,7 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 
 	// Find nearest stopped elevator first.
 	for (int i = 0; i < Elevators.Num(); i++)
-		if (Elevators[i]->GetState() == ElevatorState::kStopped)
+		if (Elevators[i]->State == ElevatorState::kStandby)
 			ElevatorIndices.Add(i);
 
 	if (!ElevatorIndices.IsEmpty())
@@ -101,7 +101,7 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 		auto Elevator = Elevators[i];
 
 		// Check if can pick it up on its way.
-		if (ForUp != (Elevator->GetState() == ElevatorState::kUp))
+		if (ForUp != (Elevator->State == ElevatorState::kUp))
 			continue;
 
 		float IntermediateHeight = Elevator->EaseMove->GetIntermediatePosition().Z;
@@ -170,7 +170,7 @@ void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const
 {
 	out.Empty();
 	for (auto Elevator : Elevators) 
-		if (Elevator->GetState() != ElevatorState::kStopped)
+		if (Elevator->State != ElevatorState::kStandby)
 			out.Add(Elevator->GateIdxWhenStopped);
 }
 
