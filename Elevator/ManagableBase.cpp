@@ -3,6 +3,8 @@
 
 #include "ManagableBase.h"
 
+PRAGMA_DISABLE_OPTIMIZATION
+
 // Sets default values
 AManagableBase::AManagableBase()
 {
@@ -25,7 +27,7 @@ void AManagableBase::PreInitializeComponents()
 		IdxInManager = GetIdxInManager();
 	}
 	else if (GetWorld()->IsGameWorld()){
-		UE_LOG(LogInit, Fatal, TEXT("Manager is not set"));
+		UE_LOG(LogInit, Warning, TEXT("Manager is not set"));
 	}
 }
 

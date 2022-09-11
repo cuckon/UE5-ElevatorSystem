@@ -42,16 +42,10 @@ protected:
 	USceneComponent* SceneComponent;
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnArrivalUp(int GateIdx, int ElevatorIdx);
+		void OnArrival(int GateIdx, int ElevatorIdx, bool ArrivalForUp);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnArrivalDown(int GateIdx, int ElevatorIdx);
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnPendingUp(int GateIdx);
-	
-	UFUNCTION(BlueprintNativeEvent, Category = "Elevator")
-		void OnPendingDown(int GateIdx);
+		void OnPending(int GateIdx, bool Up);
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		void OnElevatorReadyToGo(int ElevatorIdx);
@@ -61,11 +55,8 @@ protected:
 	// SplitGateIdx : Should be the gate that scan
 	void Schedule(int ElevatorIdx, bool PreferUp, int SplitGateIdx);
 
-	void OnArrivalUp_Implementation(int, int);
-	void OnArrivalDown_Implementation(int, int);
-	void OnPendingUp_Implementation(int);
-	void OnPendingDown_Implementation(int);
-	void OnAnyPending(bool IsUp, int GateIdx);
+	void OnArrival_Implementation(int, int, bool);
+	void OnPending_Implementation(int GateIdx, bool IsUp);
 	int NearestElevatorToGate(int GateIdx, TArray<int>& ElevatorIndices) const;
 	int BestElevatorForPendingGate(int GateIdx, bool ForUp) const;
 	void GetUntakenPendingGates(bool Up, TArray<int>& out) const;

@@ -28,10 +28,8 @@ void AElevatorBase::BeginPlay()
 
 
 void AElevatorBase::OnArrival_Implementation() {
-	FElevatorArrivalSignature ArrivalDelegates = State == ElevatorState::kUp ? ArrivalUpDelegates : ArrivalDownDelegates;
 	State = ElevatorState::kStandby;
-	int OldTargetGateIdx = GateIdxWhenStopped;
-	ArrivalDelegates.Broadcast(OldTargetGateIdx, IdxInManager);
+	ArrivalDelegates.Broadcast(GateIdxWhenStopped, IdxInManager, NextDirection == ElevatorState::kUp);
 }
 
 void AElevatorBase::MoveToGate_Implementation(int NewTargetGateIdx, ElevatorState Reason) {
@@ -49,7 +47,7 @@ void AElevatorBase::MoveToGate_Implementation(int NewTargetGateIdx, ElevatorStat
 	else
 		State = ElevatorState::kStandby;
 
-	ReasonOfMoving = Reason;
+	NextDirection = Reason;
 }
 
 int AElevatorBase::GetIdxInManager() const

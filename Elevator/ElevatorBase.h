@@ -19,7 +19,7 @@ class ELEVATOR_API AElevatorBase : public AManagableBase
 	GENERATED_BODY()
 	
 public:	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FElevatorArrivalSignature, int, GateIdx, int, ElevatorIdx);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FElevatorArrivalSignature, int, GateIdx, int, ElevatorIdx, bool, ArrivalForUp);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FElevatorReadyToGoSignature, int, ElevatorIdx);
 
 	// Sets default values for this actor's properties
@@ -29,7 +29,7 @@ public:
 		UEaseMoveComponent* EaseMove;
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
-		ElevatorState GetReasonOfMoving() const { return ReasonOfMoving; }
+		ElevatorState GetReasonOfMoving() const { return NextDirection; }
 
 	UFUNCTION(BlueprintCallable, Category = "Elevator")
 		void ReadyToGo() const { ReadyToGoDelegates.Broadcast(GetIdxInManager()); UE_LOG(LogInit, Log, TEXT("Ready To go: %d."), GateIdxWhenStopped); }
@@ -39,10 +39,7 @@ public:
 		void MoveToGate(int NewTargetGateIdx, ElevatorState Reason);
 
 	UPROPERTY(BlueprintAssignable, Category = "Elevator")
-		FElevatorArrivalSignature ArrivalUpDelegates;
-
-	UPROPERTY(BlueprintAssignable, Category = "Elevator")
-		FElevatorArrivalSignature ArrivalDownDelegates;
+		FElevatorArrivalSignature ArrivalDelegates;
 
 	UPROPERTY(BlueprintAssignable, Category = "Elevator")
 		FElevatorReadyToGoSignature ReadyToGoDelegates;
@@ -66,7 +63,7 @@ protected:
 
 	virtual int GetIdxInManager() const override;
 
-	ElevatorState ReasonOfMoving;  // Switch to this state after arrival
+	ElevatorState NextDirection;  // Reason of moving
 
 public:	
 	// Called every frame

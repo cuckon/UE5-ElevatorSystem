@@ -10,8 +10,7 @@ PRAGMA_DISABLE_OPTIMIZATION
 AGateBase::AGateBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PrimaryActorTick.bCanEverTick = false;
 }
 
  //Called when the game starts or when spawned
@@ -20,26 +19,10 @@ void AGateBase::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AGateBase::OnPendingUp_Implementation()
+void AGateBase::OnPending_Implementation(bool Up)
 {
-	IsPendingUp = true;
-	PendingUpDelegates.Broadcast(IdxInManager);
-}
-
-void AGateBase::OnPendingDown_Implementation()
-{
-	IsPendingDown = true;
-	PendingDownDelegates.Broadcast(IdxInManager);
-}
-
-void AGateBase::StartedUp_Implementation()
-{
-	IsPendingUp = false;
-}
-
-void AGateBase::StartedDown_Implementation()
-{
-	IsPendingDown = false;
+	(Up ? IsPendingUp : IsPendingDown) = true;
+	PendingDelegates.Broadcast(IdxInManager, Up);
 }
 
 int AGateBase::GetIdxInManager() const

@@ -16,7 +16,7 @@ const int kNoElevatorAvailableIdx = -1;
 AElevatorManager::AElevatorManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Default"));
 	SceneComponent->SetupAttachment(RootComponent);
@@ -38,19 +38,21 @@ void AElevatorManager::PreInitializeComponents()
 	Super::PreInitializeComponents();
 
 	Algo::Sort(Gates, [](const AGateBase* A, const AGateBase* B) {
-		return A->GetActorLocation().Z < B->GetActorLocation().Z;
+		float AHeight = A ? A->GetActorLocation().Z : -99999;
+		float BHeight = B ? B->GetActorLocation().Z : -99999;
+		return AHeight < BHeight;
 		});
 
 	for (auto Elevator : Elevators) {
+		if (!Elevator) continue;
+
 		Elevator->Manager = this;
-		Elevator->ArrivalUpDelegates.AddDynamic(this, &AElevatorManager::OnArrivalUp);
-		Elevator->ArrivalDownDelegates.AddDynamic(this, &AElevatorManager::OnArrivalDown);
+		Elevator->ArrivalDelegates.AddDynamic(this, &AElevatorManager::OnArrival);
 		Elevator->ReadyToGoDelegates.AddDynamic(this, &AElevatorManager::OnElevatorReadyToGo);
 	}
 	for (auto Gate : Gates) {
 		Gate->Manager = this;
-		Gate->PendingDownDelegates.AddDynamic(this, &AElevatorManager::OnPendingDown);
-		Gate->PendingUpDelegates.AddDynamic(this, &AElevatorManager::OnPendingUp);
+		Gate->PendingDelegates.AddDynamic(this, &AElevatorManager::OnPending);
 	}
 	UE_LOG(LogInit, Log, TEXT("PreInitializeComponents"));
 }
@@ -62,7 +64,7 @@ void AElevatorManager::BeginPlay()
 }
 
 
-void AElevatorManager::OnAnyPending(bool IsUp, int GateIdx) {
+void AElevatorManager::OnPending_Implementation(int GateIdx, bool IsUp) {
 	int ElevatorIdx = BestElevatorForPendingGate(GateIdx, IsUp);
 	if (ElevatorIdx == kNoElevatorAvailableIdx)
 		return;
@@ -88,13 +90,14 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 {
 	// 1. See if there's elevators happen to be at that gate and haven't shut the door completely.
 	for (int i = 0; i < Elevators.Num(); i++)
-		if (Elevators[i]->State == ElevatorState::kUnready && Elevators[i]->GateIdxWhenStopped==GateIdx)
+		if (Elevators[i] && Elevators[i]->State == ElevatorState::kUnready
+			&& Elevators[i]->GateIdxWhenStopped==GateIdx)
 			return i;
 
 	// 2. Try to find nearest standby elevators.
 	TArray<int> ElevatorIndices;
 	for (int i = 0; i < Elevators.Num(); i++)
-		if (Elevators[i]->State == ElevatorState::kStandby)
+		if (Elevators[i] && Elevators[i]->State == ElevatorState::kStandby)
 			ElevatorIndices.Add(i);
 
 	if (!ElevatorIndices.IsEmpty())
@@ -102,15 +105,24 @@ int AElevatorManager::BestElevatorForPendingGate(int GateIdx, bool ForUp) const
 
 	// 3. Try to finds nearest elevators that can pick up the gate.
 	for (int i = 0; i < Elevators.Num(); i++) {
+		if (!Elevators[i])
+			continue;
+
 		auto Elevator = Elevators[i];
 
-		// Check if can pick it up on its way.
+		// Check if it's manipulating its doors.
+		if (Elevator->State == ElevatorState::kUnready)
+			continue;
+
+		// Check if can pick it up on its way. i.e: Elevator is between intermediate and old target gate.
 		if (ForUp != (Elevator->State == ElevatorState::kUp))
 			continue;
 
 		float IntermediateHeight = Elevator->EaseMove->GetIntermediatePosition().Z;
+		float TargetHeight = Gates[Elevator->GateIdxWhenStopped]->GetActorLocation().Z;
 		float GateHeight = Gates[GateIdx]->GetActorLocation().Z;
-		if (ForUp && IntermediateHeight < GateHeight || !ForUp && IntermediateHeight > GateHeight)
+		if (ForUp && IntermediateHeight < GateHeight && GateHeight < TargetHeight 
+			|| !ForUp && IntermediateHeight > GateHeight && GateHeight > TargetHeight)
 			ElevatorIndices.Add(i);
 	}
 	if (!ElevatorIndices.IsEmpty())
@@ -160,6 +172,8 @@ void AElevatorManager::GetUntakenPendingGates(bool Up, TArray<int>& out) const
 	out.Empty();
 
 	for (int i = 0; i < Gates.Num(); i++) {
+		if (!Gates[i])
+			continue;
 		if (!(Up ? Gates[i]->IsPendingUp : Gates[i]->IsPendingDown))
 			continue;
 		if (Taken.Contains(i))
@@ -174,39 +188,21 @@ void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const
 {
 	out.Empty();
 	for (auto Elevator : Elevators) 
-		if (Elevator->State != ElevatorState::kStandby)
+		if (Elevator && Elevator->State != ElevatorState::kStandby)
 			out.Add(Elevator->GateIdxWhenStopped);
 }
 
-
-void AElevatorManager::OnPendingUp_Implementation(int GateIdx)
+void AElevatorManager::OnArrival_Implementation(int GateIdx, int ElevatorIdx, bool ArrivalForUp)
 {
-	AElevatorManager::OnAnyPending(true, GateIdx);
-}
-
-void AElevatorManager::OnPendingDown_Implementation(int GateIdx)
-{
-	AElevatorManager::OnAnyPending(false, GateIdx);
-}
-
-void AElevatorManager::OnArrivalUp_Implementation(int GateIdx, int ElevatorIdx)
-{
-	//OnAnyArrival(GateIdx, ElevatorIdx);
-}
-
-void AElevatorManager::OnArrivalDown_Implementation(int GateIdx, int ElevatorIdx)
-{
-	//OnAnyArrival(GateIdx, ElevatorIdx);
+	(ArrivalForUp ? Gates[GateIdx]->IsPendingUp : Gates[GateIdx]->IsPendingDown) = false;
 }
 
 void AElevatorManager::OnElevatorReadyToGo(int ElevatorIdx)
 {
 	bool MovingUp = Elevators[ElevatorIdx]->GetReasonOfMoving() == ElevatorState::kUp;
 	int GateIdx = Elevators[ElevatorIdx]->GateIdxWhenStopped;
-	((*Gates[GateIdx]).*(MovingUp ? &AGateBase::StartedUp : &AGateBase::StartedDown))();
 	Schedule(ElevatorIdx, MovingUp, GateIdx);
 }
-
 
 // Called every frame
 void AElevatorManager::Tick(float DeltaTime)

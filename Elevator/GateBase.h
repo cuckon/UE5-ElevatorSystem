@@ -14,22 +14,13 @@ class ELEVATOR_API AGateBase : public AManagableBase
 	GENERATED_BODY()
 	
 public:	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGateStateChangeSignature, int, GateIdx);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGateStateChangeSignature, int, GateIdx, bool, Up);
 
 	// Sets default values for this actor's properties
 	AGateBase();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
-		void OnPendingUp();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
-		void OnPendingDown();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
-		void StartedUp();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
-		void StartedDown();
+		void OnPending(bool Up);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
 		bool IsPendingUp = false;
@@ -37,17 +28,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
 		bool IsPendingDown = false;
 
-	FGateStateChangeSignature PendingUpDelegates;
-	FGateStateChangeSignature PendingDownDelegates;
+	FGateStateChangeSignature PendingDelegates;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void OnPendingUp_Implementation();
-	void OnPendingDown_Implementation();
-	void StartedUp_Implementation();
-	void StartedDown_Implementation();
+	void OnPending_Implementation(bool Up);
 	virtual int GetIdxInManager() const override;
 
 public:	
