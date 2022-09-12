@@ -194,7 +194,7 @@ void AElevatorManager::GetTakenPendingGates(bool Up, TArray<int>& out) const
 
 void AElevatorManager::OnArrival_Implementation(int GateIdx, int ElevatorIdx, bool ArrivalForUp)
 {
-	(ArrivalForUp ? Gates[GateIdx]->IsPendingUp : Gates[GateIdx]->IsPendingDown) = false;
+	Gates[GateIdx]->OnPicked(ArrivalForUp);
 }
 
 void AElevatorManager::OnElevatorReadyToGo(int ElevatorIdx)

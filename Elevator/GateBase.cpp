@@ -25,6 +25,11 @@ void AGateBase::OnPending_Implementation(bool Up)
 	PendingDelegates.Broadcast(IdxInManager, Up);
 }
 
+void AGateBase::OnPicked_Implementation(bool Up)
+{
+	(Up ? IsPendingUp : IsPendingDown) = false;
+}
+
 int AGateBase::GetIdxInManager() const
 {
 	return Manager->Gates.Find(const_cast<AGateBase*>(this));

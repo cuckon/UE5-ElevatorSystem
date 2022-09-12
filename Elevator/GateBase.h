@@ -21,6 +21,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
 		void OnPending(bool Up);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Elevator")
+		void OnPicked(bool Up);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Elevator")
 		bool IsPendingUp = false;
@@ -35,6 +38,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void OnPending_Implementation(bool Up);
+	void OnPicked_Implementation(bool Up);
 	virtual int GetIdxInManager() const override;
 
 public:	
