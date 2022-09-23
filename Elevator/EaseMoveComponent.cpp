@@ -20,7 +20,10 @@ UEaseMoveComponent::UEaseMoveComponent()
 
 void UEaseMoveComponent::MoveTo(const FVector& Position)
 {
-	TargetPosition = Position;
+	if (MoveX) TargetPosition.X = Position.X;
+	if (MoveY) TargetPosition.Y = Position.Y;
+	if (MoveZ) TargetPosition.Z = Position.Z;
+
 	IsArrived = false;
 	BeginMoveDelegate.Broadcast();
 }
@@ -29,7 +32,7 @@ void UEaseMoveComponent::MoveTo(const FVector& Position)
 void UEaseMoveComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	IntermediatePosition = GetOwner()->GetActorLocation();
+	TargetPosition = IntermediatePosition = GetOwner()->GetActorLocation();
 
 	// ...
 	UE_LOG(LogTemp, Log, TEXT("Speed: %f, LagS: %d"), Speed, LagSteps);
@@ -46,8 +49,6 @@ void UEaseMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	if (IsArrived)
 		return;
-
-	// ...
 
 	FVector CurrentPos = GetOwner()->GetActorLocation();
 
@@ -77,5 +78,7 @@ void UEaseMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	if (DrawIntermediatePosition)
 		DrawDebugBox(GetWorld(), IntermediatePosition, FVector(100), FColor::Green);
+	if (DrawTargetPosition)
+		DrawDebugBox(GetWorld(), TargetPosition, FVector(100), FColor::Red);
 }
 

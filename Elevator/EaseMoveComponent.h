@@ -42,9 +42,20 @@ public:
 
 	FVector GetIntermediatePosition() const { return IntermediatePosition; }
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
+		bool MoveX = true;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
+		bool MoveY = true;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
+		bool MoveZ = true;
+
+
 	// DEBUG helpers
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
 		bool DrawIntermediatePosition = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Elevator")
+		bool DrawTargetPosition = true;
 
 protected:
 	// Called when the game starts
